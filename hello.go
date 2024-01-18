@@ -1,6 +1,9 @@
 package main // mainパッケージであることを宣言
 
-import "fmt" // fmtモジュールをインポート
+import (
+	"errors"
+	"fmt"
+)
 
 func main() {		// 最初に実行されるmain()関数を定義
     fmt.Println("hello, world")
@@ -147,5 +150,86 @@ func main() {		// 最初に実行されるmain()関数を定義
 		fmt.Printf("%d: %s\n", i, color)
 	}
 	
+    funcA()
+	fmt.Println(add(5, 3))
+	add, min := addMinus(8, 5)
+    fmt.Println(add, min)
 
+	funcB(1, 2, 3, 4, 5)
+
+	var p1 Person
+    p1.SetPerson("Yamada", 26)
+    set_name, set_age := p1.GetPerson()
+    fmt.Printf("%s(%d)\n", set_name, set_age)
+	p2_1 := Person2{"Yamada", 26, 1}			// 順序通りに初期化
+	p2_2 := Person2{Name: "Tanaka", Age: 32}		// 名前で初期化
+	fmt.Println(p2_1, p2_2)
+
+}
+
+type Person2 struct {
+    Name string	// 外部からアクセス可能
+    Age int		// 外部からアクセス可能
+    status int		// 外部からアクセス不可
+}
+
+func (p *Person) SetPerson(name string, age int) {
+    p.name = name
+    p.age = age
+}
+
+func (p Person) GetPerson() (string, int) {
+    return p.name, p.age
+}
+
+type Person struct {
+    name string
+    age int
+}
+
+func funcB(a int, b ... int) {
+    fmt.Printf("a=%d\n", a)
+    for i, num := range b {
+        fmt.Printf("b[%d]=%d\n", i, num)
+    }
+}
+
+func addMinus(x int, y int) (int, int) {
+    return x + y, x - y
+}
+
+
+func add(x int, y int) int {
+    return x + y
+}
+
+func funcA() (string, error) {
+    var err error
+    filename := ""
+    data := ""
+
+    filename, err = GetFileName()
+    if err != nil {
+        fmt.Println(err)
+        goto Done
+    }
+
+    data, err = ReadFile(filename)
+    if err != nil {
+        fmt.Println(err)
+        goto Done
+    }
+
+    fmt.Println(data)
+
+Done:
+    return data, err
+}
+
+func GetFileName() (string, error) {
+    return "sample.txt", nil
+}
+
+func ReadFile(filename string) (string, error) {
+    return "Hello world!", errors.New("Can't read file")
 }
