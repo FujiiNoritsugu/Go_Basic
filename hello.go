@@ -161,17 +161,91 @@ func main() {		// 最初に実行されるmain()関数を定義
     p1.SetPerson("Yamada", 26)
     set_name, set_age := p1.GetPerson()
     fmt.Printf("%s(%d)\n", set_name, set_age)
-	p2_1 := Person2{"Yamada", 26, 1}			// 順序通りに初期化
+	p2_1 := Person2{"Yamada", 26, 1, "day of dream"}			// 順序通りに初期化
 	p2_2 := Person2{Name: "Tanaka", Age: 32}		// 名前で初期化
 	fmt.Println(p2_1, p2_2)
+    PrintOut(p1)
+    PrintOut(p2_1)
+	funcC(3)
+	funcD(false)
 
+	p4 := map[string]interface{} {
+		"name": "Yamada",
+		"age": 26,
+	}
+	PrintOut(p4)
+	p5 := dict {
+		"name": "Yamada",
+		"age": 26,
+		"address": dict {
+			"zip": "123-4567",
+			"tel": "012-3456-7890",
+		},
+	}
+	p5_name := p5["name"]
+	p5_tel := p5["address"].(dict)["tel"]	// anyをdictに変換してから参照
+	fmt.Println(p5_name)
+	fmt.Println(p5_tel)
+
+	var norm_a int		// int型変数a1を定義
+	var pointer_a *int;		// intへのポインタ変数p1を定義
+
+	pointer_a = &norm_a		// p1にa1のポインタを設定
+	*pointer_a = 123		// ポインタの中身(つまりa1)に123を代入
+	fmt.Println(norm_a)	// => 123
+	*pointer_a = 456		// ポインタの中身(つまりa1)に123を代入
+	fmt.Println(norm_a)	// => 123
+
+}
+
+type any interface{}
+type dict map[string]any
+
+func funcD(a interface{}) {
+    switch a.(type) {
+    case bool:
+        fmt.Printf("%t\n", a)
+    case int:
+        fmt.Printf("%d\n", a)
+    case string:
+        fmt.Printf("%s\n", a)
+    }
+}
+
+func funcC(a interface{}) {
+    fmt.Printf("%d\n", a.(int))
+}
+
+type Printable interface {
+    ToString() string
+}
+
+func PrintOut(a interface{}) {
+    // aをPrintableインタフェースを実装したオブジェクトに変換してみる
+    q, ok := a.(Printable)
+    if ok {
+        // 変換できたらそのインタフェースを呼び出す
+        fmt.Println(q.ToString())
+    } else {
+        fmt.Println("Not printable.")
+    }
+}
+
+func (p Person) ToString() string {
+    return p.name
+}
+
+func (p2 Person2) ToString() string {
+    return p2.title
 }
 
 type Person2 struct {
     Name string	// 外部からアクセス可能
     Age int		// 外部からアクセス可能
     status int		// 外部からアクセス不可
+	title string
 }
+
 
 func (p *Person) SetPerson(name string, age int) {
     p.name = name
