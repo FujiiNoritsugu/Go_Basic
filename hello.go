@@ -3,9 +3,15 @@ package main // mainパッケージであることを宣言
 import (
 	"errors"
 	"fmt"
+	"hello/local/mypkg"
+	"os"
+	"time"
 )
 
 func main() {		// 最初に実行されるmain()関数を定義
+	mypkg.MypkgFuncA()
+	// mypkg.mypkgFuncB()
+	
     fmt.Println("hello, world")
 	// 変数の定義
 	var a int			// 通常の定義
@@ -196,6 +202,117 @@ func main() {		// 最初に実行されるmain()関数を定義
 	*pointer_a = 456		// ポインタの中身(つまりa1)に123を代入
 	fmt.Println(norm_a)	// => 123
 
+	var a7 int = 123
+    var a8 int = 123
+    fn(a7, &a8)		// a1は値渡し、a2は参照渡し
+    fmt.Println(a7, a8)	// => 123 456
+
+	a9 := Person{"Tanaka", 26}	// 構造体Personのオブジェクトa1を確保して初期化
+	p9 := &a9			// 構造体a1へのポインタをp1に格納
+	fmt.Println(a9.name)		// メンバ変数には左記のようにアクセス
+	fmt.Println((*p9).name)		// ポインタpの中身(後続体)のメンバ変数には左記のようにアクセス
+	fmt.Println(p9.name)		// ただし、Go言語ではこれを、左記のようにも記述できる
+	
+    bookList := []*Book{}
+
+    for i := 0; i < 10; i++ {
+        book := new(Book)
+        book.title = fmt.Sprintf("Title#%d", i)
+        bookList = append(bookList, book)
+    }
+    for _, book := range bookList {
+        fmt.Println(book.title)
+    }
+	funcE()
+
+	go funcF()
+    for i := 0; i < 10; i++ {
+        fmt.Print("M")
+        time.Sleep(20 * time.Millisecond)
+    }
+
+	chA := make(chan string)	// チャネルを作成する
+    defer close(chA)		// 使い終わったらクローズする
+    go funcG(chA)		// チャネルをゴルーチンに渡す
+    msg := <- chA		// チャネルからメッセージを受信する
+    fmt.Println(msg)
+
+	chC := make(chan string)
+    chD := make(chan string)
+    defer close(chC)
+    defer close(chD)
+    finflagC := false
+    finflagD := false
+    go funcH(chC)
+    go funcI(chD)
+    for {
+        select {
+        case msg := <- chC:
+            finflagC = true
+            fmt.Println(msg)
+        case msg := <- chD:
+            finflagD = true
+            fmt.Println(msg)
+        }
+        if finflagC && finflagD {
+            break
+        }
+    }
+
+}
+
+func funcH(chA chan <- string) {
+    time.Sleep(1 * time.Second)
+    chA <- "funcH Finished"
+}
+
+func funcI(chB chan <- string) {
+    time.Sleep(2 * time.Second)
+    chB <- "funcI Finished"
+}
+
+func funcG(chA chan <- string) {
+    time.Sleep(3 * time.Second)
+    chA <- "Finished"		// チャネルにメッセージを送信する
+}
+
+func funcF() {
+    for i := 0; i < 10; i++ {
+        fmt.Print("A")
+        time.Sleep(10 * time.Millisecond)
+    }
+}
+
+
+func funcE() {
+    fp, err := os.Open("/home/fujii/Go_Basic/sample.txt")
+    if err != nil {
+        return
+    }
+    defer fp.Close()
+
+    for {
+		var temp []byte
+        n, err := fp.Read(temp)
+		if err != nil {
+			fmt.Printf("エラーが発生しました。%v", err)
+			break
+		}
+		fmt.Printf("n=%d", n)
+		if n == 0{
+			break
+		}
+		fmt.Println(temp)
+    }
+}
+
+type Book struct {
+    title string
+}
+
+func fn(b1 int, b2 *int) {
+    b1 = 456
+    *b2 = 456
 }
 
 type any interface{}
