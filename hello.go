@@ -6,9 +6,12 @@ import (
 	"hello/local/mypkg"
 	"os"
 	"time"
-)
 
+	"golang.org/x/example/hello/reverse"
+)
 func main() {		// 最初に実行されるmain()関数を定義
+	fmt.Println(reverse.String("Hello, Go!"))
+	
 	mypkg.MypkgFuncA()
 	// mypkg.mypkgFuncB()
 	
